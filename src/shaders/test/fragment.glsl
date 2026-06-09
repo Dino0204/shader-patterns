@@ -25,7 +25,9 @@ void main()
     vec2 cellPointPosition = fract(uv);
     float m_dist = 10.0;
     vec2  m_cellId = vec2(0.0);   // 이긴 점(가장 가까운 점)의 칸 ID
+    vec2  m_diff = vec2(0.0);     // 이긴 점까지의 상대 벡터 (경계 계산에 필요)
 
+    // 1차 패스: 가장 가까운 점 찾기
     for (int y= -1; y <= 1; y++) {
         for (int x= -1; x <= 1; x++) {
             // Neighbor place in the grid
@@ -38,14 +40,32 @@ void main()
             if (dist < m_dist) {                 // min() 대신 if 로: 누가 이겼는지 잡으려고
                 m_dist = dist;
                 m_cellId = cellId + neighbor;    // 이긴 칸 ID도 같이 기록
+                m_diff = diff;                   // 이긴 점까지의 벡터도 저장
             }
         }
     }
 
-    // 파편마다 다른 단색으로 칠하기 (셀 ID -> 무작위 색)
-    vec3 cellColor = vec3(random(m_cellId), random(m_cellId).y);
+    // 2차 패스: 가장 가까운 경계(균열)까지의 거리
+    float m_edge = 10.0;
+    for (int y= -1; y <= 1; y++) {
+        for (int x= -1; x <= 1; x++) {
+            vec2 neighbor = vec2(float(x),float(y));
+            vec2 randomPoint = random(cellId + neighbor);
+            vec2 diff = (neighbor + randomPoint) - cellPointPosition;
 
-    gl_FragColor = vec4(cellColor, 1.0);
+            // 이긴 점 자기 자신은 건너뛰기 (거의 같은 벡터면 skip)
+            if (dot(m_diff - diff, m_diff - diff) > 0.0001) {
+                // 내 점과 이웃 점의 수직이등분선(=셀 경계)까지 거리
+                m_edge = min(m_edge,
+                             dot(0.5 * (m_diff + diff), normalize(diff - m_diff)));
+            }
+        }
+    }
+
+    // 경계 근처(m_edge 작음)를 밝은 선으로: 흰 균열 on 검정
+    float crack = 1.0 - smoothstep(0.0, 0.05, m_edge);
+
+    gl_FragColor = vec4(vec3(crack), 1.0);
 
     
 }
