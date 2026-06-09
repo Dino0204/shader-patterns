@@ -9,6 +9,8 @@ uniform float uCrackBrightness;
 uniform float uAberration;
 uniform vec3 uCrackColor;
 uniform float uImpactRadius;
+uniform float uParticleDensity;
+uniform float uParticleAmount;
 
 
 vec2 random(vec2 p)
@@ -17,6 +19,31 @@ vec2 random(vec2 p)
              dot(p, vec2(269.5, 183.3)));
 
     return fract(sin(p) * 43758.5453);
+}
+
+// 떠다니는 유리 가루: 촘촘한 격자 칸마다 작은 반짝이 점을 박는다
+float particles(vec2 p, float density)
+{
+    vec2 gv = p * density;
+    vec2 id = floor(gv);
+    vec2 f  = fract(gv);
+
+    float result = 0.0;
+    for (int y = -1; y <= 1; y++) {
+        for (int x = -1; x <= 1; x++) {
+            vec2 offs = vec2(float(x), float(y));
+            vec2 cellId = id + offs;
+
+            vec2 pos  = random(cellId);                 // 칸 안 점 위치 0~1
+            float exists = step(0.55, random(cellId + 13.0).x); // 일부 칸만 (확률)
+            float radius = mix(0.02, 0.07, random(cellId + 5.0).y); // 점 크기 랜덤
+            float bright = mix(0.4, 1.0, random(cellId + 7.0).x);   // 밝기 랜덤
+
+            float d = length(f - (offs + pos));
+            result += exists * bright * smoothstep(radius, 0.0, d);
+        }
+    }
+    return result;
 }
 
 void main()
@@ -86,6 +113,10 @@ void main()
     // 경계 근처(m_edge 작음)를 균열선으로: 푸른빛을 위에 덧칠
     float crack = 1.0 - smoothstep(0.0, uCrackWidth, m_edge);
     color += crack * uCrackBrightness * uCrackColor * impact;
+
+    // 떠다니는 유리 가루 (균열 색조로 반짝)
+    float dust = particles(vUv, uParticleDensity);
+    color += dust * uParticleAmount * uCrackColor;
 
     gl_FragColor = vec4(color, 1.0);
 

@@ -45,7 +45,9 @@ const material = new THREE.ShaderMaterial({
         uCrackBrightness: { value: 1.0 },
         uAberration: { value: 0.5 },
         uCrackColor: { value: new THREE.Color('#99ccff') },
-        uImpactRadius: { value: 0.6 }
+        uImpactRadius: { value: 0.6 },
+        uParticleDensity: { value: 25.0 },
+        uParticleAmount: { value: 1.0 }
     }
 })
 
@@ -61,6 +63,8 @@ gui.add(material.uniforms.uCrackWidth, 'value', 0, 0.2, 0.001).name('Crack Width
 gui.add(material.uniforms.uCrackBrightness, 'value', 0, 3, 0.01).name('Crack Bright')
 gui.add(material.uniforms.uAberration, 'value', 0, 2, 0.01).name('Aberration')
 gui.add(material.uniforms.uImpactRadius, 'value', 0.1, 1.5, 0.01).name('Impact Radius')
+gui.add(material.uniforms.uParticleDensity, 'value', 5, 80, 1).name('Particle Density')
+gui.add(material.uniforms.uParticleAmount, 'value', 0, 3, 0.01).name('Particle Amount')
 gui.addColor(debugObject, 'crackColor').name('Crack Color').onChange(() =>
 {
     material.uniforms.uCrackColor.value.set(debugObject.crackColor)
