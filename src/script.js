@@ -42,15 +42,27 @@ const material = new THREE.ShaderMaterial({
         uRefractAmount: { value: 0.05 },
         uTexture: { value: backgroundTexture },
         uCrackWidth: { value: 0.05 },
-        uCrackBrightness: { value: 1.0 }
+        uCrackBrightness: { value: 1.0 },
+        uAberration: { value: 0.5 },
+        uCrackColor: { value: new THREE.Color('#99ccff') }
     }
 })
+
+// 컬러피커용 디버그 객체
+const debugObject = {
+    crackColor: '#99ccff'
+}
 
 // Debug controls
 gui.add(material.uniforms.uGridSize, 'value', 1, 30, 1).name('Grid Size')
 gui.add(material.uniforms.uRefractAmount, 'value', 0, 0.3, 0.001).name('Refract')
 gui.add(material.uniforms.uCrackWidth, 'value', 0, 0.2, 0.001).name('Crack Width')
 gui.add(material.uniforms.uCrackBrightness, 'value', 0, 3, 0.01).name('Crack Bright')
+gui.add(material.uniforms.uAberration, 'value', 0, 2, 0.01).name('Aberration')
+gui.addColor(debugObject, 'crackColor').name('Crack Color').onChange(() =>
+{
+    material.uniforms.uCrackColor.value.set(debugObject.crackColor)
+})
 
 // Mesh
 const mesh = new THREE.Mesh(geometry, material)
