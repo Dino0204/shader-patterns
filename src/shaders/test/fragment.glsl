@@ -8,6 +8,7 @@ uniform float uCrackWidth;
 uniform float uCrackBrightness;
 uniform float uAberration;
 uniform vec3 uCrackColor;
+uniform float uImpactRadius;
 
 
 vec2 random(vec2 p)
@@ -70,7 +71,10 @@ void main()
 
     // ── 4층: 굴절 ──
     // 파편(m_cellId)마다 다른 방향으로 배경 UV를 밀어서 샘플링
-    vec2 refractOffset = (random(m_cellId) - 0.5) * uRefractAmount;
+    // 중앙 충격: 화면 중앙=1, 바깥으로 갈수록 0 (충격이 가운데서 가장 셈)
+    float impact = 1.0 - smoothstep(0.0, uImpactRadius, length(vUv - 0.5));
+
+    vec2 refractOffset = (random(m_cellId) - 0.5) * uRefractAmount * impact;
 
     // 색수차: R/G/B 를 굴절 방향으로 조금씩 더/덜 밀어서 따로 샘플 → 경계에서 색이 갈라짐
     vec2 ca = refractOffset * uAberration;
@@ -81,7 +85,7 @@ void main()
 
     // 경계 근처(m_edge 작음)를 균열선으로: 푸른빛을 위에 덧칠
     float crack = 1.0 - smoothstep(0.0, uCrackWidth, m_edge);
-    color += crack * uCrackBrightness * uCrackColor;
+    color += crack * uCrackBrightness * uCrackColor * impact;
 
     gl_FragColor = vec4(color, 1.0);
 
