@@ -18,7 +18,12 @@ const scene = new THREE.Scene()
 
 // Texture (static 폴더는 루트로 서빙됨 → '/image.png')
 const textureLoader = new THREE.TextureLoader()
-const backgroundTexture = textureLoader.load('/image.png')
+const backgroundTexture = textureLoader.load('/image.png', (texture) =>
+{
+    // 이미지 로드 완료 후, 플레인을 이미지 비율에 맞춤 (찌그러짐 방지)
+    const aspect = texture.image.width / texture.image.height
+    mesh.scale.set(aspect, 1, 1)
+})
 
 /**
  * Test mesh
