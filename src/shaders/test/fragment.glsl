@@ -2,6 +2,10 @@ varying vec2 vUv;
 
 uniform float uTime;
 uniform float uGridSize;
+uniform float uRefractAmount;
+uniform sampler2D uTexture;
+uniform float uCrackWidth;
+uniform float uCrackBrightness;
 
 
 vec2 random(vec2 p)
@@ -62,10 +66,16 @@ void main()
         }
     }
 
-    // 경계 근처(m_edge 작음)를 밝은 선으로: 흰 균열 on 검정
-    float crack = 1.0 - smoothstep(0.0, 0.05, m_edge);
+    // ── 4층: 굴절 ──
+    // 파편(m_cellId)마다 다른 방향으로 배경 UV를 밀어서 샘플링
+    vec2 refractOffset = (random(m_cellId) - 0.5) * uRefractAmount;
+    vec3 color = texture2D(uTexture, vUv + refractOffset).rgb;
 
-    gl_FragColor = vec4(vec3(crack), 1.0);
+    // 경계 근처(m_edge 작음)를 밝은 선으로: 흰 균열을 위에 덧칠
+    float crack = 1.0 - smoothstep(0.0, uCrackWidth, m_edge);
+    color += crack * uCrackBrightness;
+
+    gl_FragColor = vec4(color, 1.0);
 
     
 }
