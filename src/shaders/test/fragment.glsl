@@ -24,11 +24,7 @@ void main()
     vec2 cellId = floor(uv);
     vec2 cellPointPosition = fract(uv);
     float m_dist = 10.0;
-
-    // vec2 randomPoint = random(cellId);
-
-    // vec2 diff = randomPoint - cellPointPosition;
-    // float dist = length(diff);
+    vec2  m_cellId = vec2(0.0);   // 이긴 점(가장 가까운 점)의 칸 ID
 
     for (int y= -1; y <= 1; y++) {
         for (int x= -1; x <= 1; x++) {
@@ -39,11 +35,17 @@ void main()
             vec2 diff = (neighbor + randomPoint) - cellPointPosition;
             float dist = length(diff);
 
-            m_dist = min(m_dist, dist);
+            if (dist < m_dist) {                 // min() 대신 if 로: 누가 이겼는지 잡으려고
+                m_dist = dist;
+                m_cellId = cellId + neighbor;    // 이긴 칸 ID도 같이 기록
+            }
         }
     }
 
-    gl_FragColor = vec4(vec3(m_dist), 1.0);
+    // 파편마다 다른 단색으로 칠하기 (셀 ID -> 무작위 색)
+    vec3 cellColor = vec3(random(m_cellId), random(m_cellId).y);
+
+    gl_FragColor = vec4(cellColor, 1.0);
 
     
 }
