@@ -1,6 +1,7 @@
 varying vec2 vUv;
 
 uniform float uTime;
+uniform float uGridSize;
 
 
 vec2 random(vec2 p)
@@ -17,8 +18,8 @@ void main()
     // 일단 UV 공간을 그대로 색으로 출력한다.
     // (좌하단 = 검정, 오른쪽으로 갈수록 빨강, 위로 갈수록 초록)
     // 이 좌표 uv 위에서 floor()/fract() 로 그리드를 나누기 시작하면 된다.
-    vec2 uv = vUv;
-    uv *= 3.0;
+    vec2 uv = vUv - 0.5;   // 원점을 화면 중앙으로 (-0.5 ~ 0.5)
+    uv *= uGridSize;       // GUI 슬라이더로 칸 개수 조절
 
     vec2 cellId = floor(uv);
     vec2 cellPointPosition = fract(uv);

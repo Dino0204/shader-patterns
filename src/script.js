@@ -28,9 +28,13 @@ const material = new THREE.ShaderMaterial({
     fragmentShader: testFragmentShader,
     side: THREE.DoubleSide,
     uniforms: {
-        uTime: { value: 0 }
+        uTime: { value: 0 },
+        uGridSize: { value: 5.0 }
     }
 })
+
+// Debug controls
+gui.add(material.uniforms.uGridSize, 'value', 1, 30, 1).name('Grid Size')
 
 // Mesh
 const mesh = new THREE.Mesh(geometry, material)
