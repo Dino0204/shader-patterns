@@ -1,55 +1,17 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import GUI from 'lil-gui'
-import testVertexShader from './shaders/test/vertex.glsl'
-import testFragmentShader from './shaders/test/fragment.glsl'
+import { createGlass } from './pattern.js'
 
 /**
  * Base
  */
-// Debug
 const gui = new GUI()
-
-// Canvas
 const canvas = document.querySelector('canvas.webgl')
 
-// Scene
-const scene = new THREE.Scene()
-
-// Texture (static 폴더는 루트로 서빙됨 → '/image.png')
-const textureLoader = new THREE.TextureLoader()
-const backgroundTexture = textureLoader.load('/image.png', (texture) =>
-{
-    // 이미지 로드 완료 후, 플레인을 이미지 비율에 맞춤 (찌그러짐 방지)
-    const aspect = texture.image.width / texture.image.height
-    mesh.scale.set(aspect, 1, 1)
-})
-
-/**
- * Test mesh
- */
-// Geometry
-const geometry = new THREE.PlaneGeometry(1, 1, 32, 32)
-
-// Material
-const material = new THREE.ShaderMaterial({
-    vertexShader: testVertexShader,
-    fragmentShader: testFragmentShader,
-    side: THREE.DoubleSide,
-    uniforms: {
-        uTime: { value: 0 },
-        uGridSize: { value: 5.0 },
-        uRefractAmount: { value: 0.05 },
-        uTexture: { value: backgroundTexture },
-        uCrackWidth: { value: 0.05 },
-        uCrackBrightness: { value: 1.0 },
-        uAberration: { value: 0.5 },
-        uCrackColor: { value: new THREE.Color('#99ccff') },
-        uImpactRadius: { value: 0.6 },
-        uParticleDensity: { value: 25.0 },
-        uParticleAmount: { value: 1.0 }
-    }
-})
+// 패턴(씬·카메라·머티리얼)은 공용 팩토리에서 생성
+const pattern = createGlass()
+const { scene, camera, material } = pattern
 
 // 컬러피커용 디버그 객체
 const debugObject = {
@@ -70,10 +32,6 @@ gui.addColor(debugObject, 'crackColor').name('Crack Color').onChange(() =>
     material.uniforms.uCrackColor.value.set(debugObject.crackColor)
 })
 
-// Mesh
-const mesh = new THREE.Mesh(geometry, material)
-scene.add(mesh)
-
 /**
  * Sizes
  */
@@ -84,28 +42,18 @@ const sizes = {
 
 window.addEventListener('resize', () =>
 {
-    // Update sizes
     sizes.width = window.innerWidth
     sizes.height = window.innerHeight
 
-    // Update camera
-    camera.aspect = sizes.width / sizes.height
-    camera.updateProjectionMatrix()
+    pattern.setSize(sizes.width, sizes.height)
 
-    // Update renderer
     renderer.setSize(sizes.width, sizes.height)
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 })
 
 /**
- * Camera
+ * Controls
  */
-// Base camera
-const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
-camera.position.set(0.25, - 0.25, 1)
-scene.add(camera)
-
-// Controls
 const controls = new OrbitControls(camera, canvas)
 controls.enableDamping = true
 
@@ -115,6 +63,7 @@ controls.enableDamping = true
 const renderer = new THREE.WebGLRenderer({
     canvas: canvas
 })
+pattern.setSize(sizes.width, sizes.height)
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
@@ -127,16 +76,10 @@ const tick = () =>
 {
     const elapsedTime = clock.getElapsedTime()
 
-    // Update uniforms
-    material.uniforms.uTime.value = elapsedTime
-
-    // Update controls
+    pattern.update(elapsedTime)
     controls.update()
-
-    // Render
     renderer.render(scene, camera)
 
-    // Call tick again on the next frame
     window.requestAnimationFrame(tick)
 }
 

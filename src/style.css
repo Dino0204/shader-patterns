@@ -2,6 +2,7 @@
 {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
 }
 
 html,
@@ -16,4 +17,131 @@ body
     top: 0;
     left: 0;
     outline: none;
+}
+
+/* ── 패턴 페이지 공통: 목록으로 돌아가는 링크 ── */
+.back-link
+{
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    z-index: 10;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.45);
+    color: #fff;
+    font: 500 13px/1 system-ui, sans-serif;
+    text-decoration: none;
+    backdrop-filter: blur(6px);
+    transition: background 0.15s ease;
+}
+
+.back-link:hover
+{
+    background: rgba(0, 0, 0, 0.7);
+}
+
+/* ── 허브(목록) 페이지 ── */
+body.hub
+{
+    overflow: auto;
+    min-height: 100vh;
+    background: #0b1026;
+    color: #f4f6ff;
+    font-family: system-ui, -apple-system, sans-serif;
+}
+
+/* 모든 미리보기를 그리는 단일 캔버스: 화면을 덮고 카드 뒤에 깔린다.
+   미리보기 영역 밖은 투명하게 비워져 페이지 배경(#0b1026)이 비친다. */
+#preview-canvas
+{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    z-index: 0;
+    pointer-events: none; /* 클릭은 카드로 통과 */
+}
+
+.hub-wrap
+{
+    position: relative;
+    z-index: 1; /* 캔버스 위로 */
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 72px 24px 96px;
+}
+
+.hub-wrap h1
+{
+    font-size: 40px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+.hub-sub
+{
+    margin-top: 10px;
+    color: #9aa3c7;
+    font-size: 15px;
+}
+
+.pattern-list
+{
+    list-style: none;
+    margin-top: 40px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 18px;
+}
+
+/* 카드는 채움 배경 없이 테두리만 → 미리보기 창이 캔버스를 그대로 비춘다 */
+.card
+{
+    display: block;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.card:hover
+{
+    border-color: rgba(153, 204, 255, 0.55);
+    transform: translateY(-2px);
+}
+
+/* 투명 창: 이 영역의 위치에 뒤쪽 캔버스가 패턴을 그린다 */
+.card-preview
+{
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    background: transparent;
+}
+
+.card-body
+{
+    display: block;
+    padding: 14px 16px 16px;
+    background: rgba(11, 16, 38, 0.55);
+}
+
+.pattern-name
+{
+    display: block;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.pattern-desc
+{
+    display: block;
+    margin-top: 4px;
+    font-size: 13px;
+    color: #9aa3c7;
 }

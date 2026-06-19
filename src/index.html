@@ -1,13 +1,41 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shader patterns</title>
     <link rel="stylesheet" href="./style.css">
 </head>
-<body>
-    <canvas class="webgl"></canvas>
-    <script type="module" src="./script.js"></script>
+<body class="hub">
+    <!-- 모든 미리보기를 그리는 단일 캔버스 (카드 뒤에 깔림) -->
+    <canvas id="preview-canvas"></canvas>
+
+    <main class="hub-wrap">
+        <h1>Shader Patterns</h1>
+        <p class="hub-sub">셰이더 패턴 모음 · 각 항목을 눌러 확인하세요</p>
+
+        <ul class="pattern-list">
+            <li>
+                <a class="card" href="./glass/index.html">
+                    <span class="card-preview" data-preview="glass"></span>
+                    <span class="card-body">
+                        <span class="pattern-name">유리 균열</span>
+                        <span class="pattern-desc">보로노이 파편 · 굴절 · 색수차 · 유리 가루</span>
+                    </span>
+                </a>
+            </li>
+            <li>
+                <a class="card" href="./dotted-background/index.html">
+                    <span class="card-preview" data-preview="dotted-background"></span>
+                    <span class="card-body">
+                        <span class="pattern-name">점 배경</span>
+                        <span class="pattern-desc">중앙에서 퍼지는 물결 도트 그리드</span>
+                    </span>
+                </a>
+            </li>
+        </ul>
+    </main>
+
+    <script type="module" src="./hub.js"></script>
 </body>
 </html>
